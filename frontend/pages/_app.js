@@ -2,8 +2,6 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Head from 'next/head';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { ThemeProvider } from '@material-ui/core/styles';
-import theme from '@wui/theme';
 
 const App = ({ Component, pageProps }) => {
   useEffect(() => {
@@ -15,7 +13,7 @@ const App = ({ Component, pageProps }) => {
   });
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <Head>
         <meta
           name="viewport"
@@ -30,7 +28,7 @@ const App = ({ Component, pageProps }) => {
 
       <CssBaseline />
       <Component {...pageProps} />
-    </ThemeProvider>
+    </>
   );
 };
 
