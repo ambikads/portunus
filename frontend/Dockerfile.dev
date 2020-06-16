@@ -2,9 +2,7 @@ FROM node:13
 
 RUN mkdir /code
 WORKDIR /code
-COPY . .
+ADD package.json /code/
 RUN yarn install
-RUN npm build
 
-EXPOSE 3000
-CMD npm start -p 3000
+CMD yarn dev -p 3000
