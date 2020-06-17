@@ -10,7 +10,7 @@ const Login = () => {
   return (
     <AuthBase submitCredentials={login} submitText="Login" headerText="Login">
       <Typography>
-        Don't have an account yet?&nbsp;
+        Don't have an account?&nbsp;
         <KeepParamsLink href="/register">
           <a>Create Account</a>
         </KeepParamsLink>
