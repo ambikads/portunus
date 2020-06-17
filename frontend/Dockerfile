@@ -4,7 +4,7 @@ RUN mkdir /code
 WORKDIR /code
 COPY . .
 RUN yarn install
-RUN npm build
+RUN npm run build
 
 EXPOSE 3000
 CMD npm start -p 3000

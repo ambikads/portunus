@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node next-server.js",
     "build": "next build",
-    "start": "npm build && NODE_ENV=production node next-server.js",
+    "start": "npm run build && NODE_ENV=production node next-server.js",
     "pretty-lint": "pretty-quick --check --branch",
     "eslint": "node_modules/.bin/eslint --ext .js,.jsx ."
   },
