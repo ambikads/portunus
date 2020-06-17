@@ -15,6 +15,10 @@
     "extends": "base",
     "domain": "api-dev.portunus.willing.com"
   },
+  "qa": {
+    "extends": "base",
+    "domain": "api-qa.portunus.willing.com"
+  },
   "staging": {
     "extends": "base",
     "domain": "api-staging.portunus.willing.com"
