@@ -7,7 +7,6 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
-RUN npm run build
 
 EXPOSE 3000
-CMD npm start -p 3000
+CMD yarn start -p 3000
