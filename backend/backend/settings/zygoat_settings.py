@@ -151,7 +151,7 @@ REST_FRAMEWORK = {
 
 # Set security headers
 
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
