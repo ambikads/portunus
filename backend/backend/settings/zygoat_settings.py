@@ -129,11 +129,10 @@ SESSION_COOKIE_DOMAIN = SHARED_DOMAIN
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
-SESSION_COOKIE_AGE = 604800
+SESSION_COOKIE_AGE = 3600
 
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 
 REST_FRAMEWORK = {
@@ -148,16 +147,19 @@ REST_FRAMEWORK = {
     ),
 }
 
+
 # Set security headers
 
-if not DEBUG:
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+X_FRAME_OPTIONS = "DENY"
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
+
+# production must use SMTP. others will use DJANGO_EMAIL_BACKEND or default to "console"
 EMAIL_BACKEND = "django.core.mail.backends.{}.EmailBackend".format(
-    "console" if DEBUG else "smtp"
+    env.str("DJANGO_EMAIL_BACKEND", default="console") if DEBUG else "smtp"
 )
 EMAIL_HOST = "email-smtp.us-east-1.amazonaws.com"
 EMAIL_PORT = 587
@@ -165,5 +167,6 @@ EMAIL_HOST_USER = prod_required_env("DJANGO_EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = prod_required_env("DJANGO_EMAIL_HOST_PASSWORD", "")
 EMAIL_USE_TLS = True
 
-SUPPORT_PHONE_NUMBER = prod_required_env("DJANGO_SUPPORT_PHONE_NUMBER", "")
-SUPPORT_EMAIL_ADDRESS = prod_required_env("DJANGO_SUPPORT_EMAIL_ADDRESS", "")
+SUPPORT_PHONE_NUMBER = "+1 (855) 943-4177"
+SUPPORT_EMAIL_ADDRESS = "support@legalplans.com"
+PANEL_EMAIL_ADDRESS = "panel@legalplans.com"

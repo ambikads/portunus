@@ -2,7 +2,8 @@ import axios from 'axios';
 
 const TOKEN_REFRESH_INTERVAL = 4 * 60 * 1000; // 4 min in ms
 
-export const PORTUNUS_URL = process.env.PORTUNUS_URL || 'https://dev.portunus.willing.com';
+export const PORTUNUS_URL =
+  process.env.NEXT_PUBLIC_PORTUNUS_URL || 'https://dev.portunus.willing.com';
 
 const defaultFetch = () =>
   axios({ method: 'post', url: `${PORTUNUS_URL}/api/auth/token/refresh/`, withCredentials: true });
@@ -15,7 +16,7 @@ export const withReturn = url => {
     return url;
   }
   const params = new URLSearchParams();
-  params.append('next', window.location.href);
+  params.append('next', encodeURIComponent(window.location.href));
   return `${url}?${params.toString()}`;
 };
 
