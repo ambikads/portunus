@@ -3,24 +3,27 @@ import { observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next/router';
 
-import Form from '@wui/layout/form';
 import Button from '@wui/input/button';
+import Form from '@wui/layout/form';
 import Spacer from '@wui/layout/spacer';
 import Textbox from '@wui/input/textbox';
 import Typography from '@wui/basics/typography';
 
-import { useGlobalContext, useInputFieldState } from '@@/utils/hooks';
+import TermsCheckbox from '@@/components/TermsCheckbox';
+import { useGlobalContext, useInputFieldState } from '@@/hooks';
 
 const AuthBase = ({
   submitCredentials,
   submitText,
   headerText,
   confirmPassword: showConfirmPassword,
+  showTerms,
   children,
 }) => {
   const [email, onChangeEmail] = useInputFieldState('');
   const [password, onChangePassword] = useInputFieldState('');
   const [confirmPassword, onChangeConfirmPassword] = useInputFieldState('');
+  const [termsOfService, setTermsOfService] = useState(false);
   const [inputErrors, setInputErrors] = useState({});
   const [processing, setProcessing] = useState(false);
   const router = useRouter();
@@ -50,6 +53,10 @@ const AuthBase = ({
       } else if (password !== confirmPassword) {
         errors.confirmPassword = 'Passwords do not match.';
       }
+    }
+
+    if (showTerms && !termsOfService) {
+      errors.terms = 'Please agree to continue.';
     }
 
     setInputErrors(errors);
@@ -104,7 +111,7 @@ const AuthBase = ({
           name="email"
           type="email"
           label="Email"
-          autoComplete="username"
+          autoComplete={showConfirmPassword ? 'off' : 'username'}
           value={email}
           onChange={onChangeEmail}
           error={inputErrors.email}
@@ -113,7 +120,7 @@ const AuthBase = ({
           name="password"
           type="password"
           label="Password"
-          autoComplete="current-password"
+          autoComplete={showConfirmPassword ? 'off' : 'current-password'}
           value={password}
           onChange={onChangePassword}
           error={inputErrors.password}
@@ -124,9 +131,16 @@ const AuthBase = ({
             name="confirmPassword"
             type="password"
             label="Confirm Password"
+            autoComplete="off"
             value={confirmPassword}
             onChange={onChangeConfirmPassword}
             error={inputErrors.confirmPassword}
+          />
+        )}
+        {showTerms && (
+          <TermsCheckbox
+            onChange={() => setTermsOfService(!termsOfService)}
+            error={inputErrors.terms}
           />
         )}
         <Spacer v={8} />
@@ -156,11 +170,13 @@ AuthBase.propTypes = {
   submitText: PropTypes.string.isRequired,
   headerText: PropTypes.string.isRequired,
   confirmPassword: PropTypes.bool,
+  showTerms: PropTypes.bool,
   children: PropTypes.node.isRequired,
 };
 
 AuthBase.defaultProps = {
   confirmPassword: false,
+  showTerms: false,
 };
 
 export default observer(AuthBase);

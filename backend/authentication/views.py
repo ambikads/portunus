@@ -2,10 +2,13 @@ import json
 
 from django.views.decorators.http import require_POST
 from django.core.exceptions import ValidationError
-from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from django.contrib.auth import logout as logout_user
+from rest_framework.generics import CreateAPIView, RetrieveDestroyAPIView
 from rest_framework_simplejwt.views import TokenRefreshView as SimpleJWTTokenRefreshView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import permission_classes, api_view
+
+from authentication.utils import blacklist_user_tokens
 
 from .serializers import (
     RegistrationSerializer,
@@ -21,6 +24,7 @@ from .utils import (
     check_onetime_token,
     make_response,
     get_valid_redirect_url,
+    check_password_for_auth_change,
 )
 from .errors import AUTH_FAILURE, INVALID_TOKEN, INVALID_EMAIL
 from shared.email import PortunusMailer
@@ -30,7 +34,7 @@ def make_auth_view(serializer_class):
     @require_POST
     def view(request):
         data = json.loads(request.body)
-        serializer = serializer_class(data=data)
+        serializer = serializer_class(data=data, context={"request": request})
 
         if not serializer.is_valid():
             first_errors = {k: v[0] for k, v in serializer.errors.items()}
@@ -55,8 +59,9 @@ def change_password(request):
     password = request.data.get("password")
     new_password = request.data.get("new_password")
 
-    if not user.check_password(password):
-        return make_response(False, {"error": AUTH_FAILURE})
+    response = check_password_for_auth_change(request, user, password)
+    if response is not None:
+        return response
 
     return check_and_change_password(request, user, new_password)
 
@@ -68,8 +73,9 @@ def change_email(request):
     password = request.data.get("password")
     new_email = request.data.get("new_email")
 
-    if not user.check_password(password):
-        return make_response(False, {"error": AUTH_FAILURE})
+    response = check_password_for_auth_change(request, user, password)
+    if response is not None:
+        return response
 
     # TODO get a confirmation email going with a link that will
     # verify the email address.
@@ -149,10 +155,16 @@ class CreateUserView(CreateAPIView):
             return make_response(False, data)
 
 
-class RetrieveUserView(RetrieveAPIView):
+class RetrieveDeleteUserView(RetrieveDestroyAPIView):
     serializer_class = UserSerializer
     lookup_field = "portunus_uuid"
     queryset = User.objects.all()
+
+    def delete(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            blacklist_user_tokens(request.user)
+        logout_user(request)
+        return self.destroy(request, *args, **kwargs)
 
 
 @api_view(["GET"])
